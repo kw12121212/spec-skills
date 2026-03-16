@@ -92,11 +92,13 @@ describe('openspec CLI e2e basics', () => {
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('OpenSpec Setup Complete');
 
-      // Check that skills were created for multiple tools
+      // Check that supported tool skill links were created
       const claudeSkillPath = path.join(emptyProjectDir, '.claude/skills/openspec-explore/SKILL.md');
-      const cursorSkillPath = path.join(emptyProjectDir, '.cursor/skills/openspec-explore/SKILL.md');
+      const opencodeSkillPath = path.join(emptyProjectDir, '.opencode/skills/openspec-explore/SKILL.md');
+      const canonicalSkillPath = path.join(emptyProjectDir, 'openspec/skills/openspec-explore/SKILL.md');
       expect(await fileExists(claudeSkillPath)).toBe(true);
-      expect(await fileExists(cursorSkillPath)).toBe(true);
+      expect(await fileExists(opencodeSkillPath)).toBe(true);
+      expect(await fileExists(canonicalSkillPath)).toBe(true);
     });
 
     it('initializes with --tools list option', async () => {
@@ -111,9 +113,9 @@ describe('openspec CLI e2e basics', () => {
 
       // New init creates skills, not CLAUDE.md
       const claudeSkillPath = path.join(emptyProjectDir, '.claude/skills/openspec-explore/SKILL.md');
-      const cursorSkillPath = path.join(emptyProjectDir, '.cursor/skills/openspec-explore/SKILL.md');
+      const opencodeSkillPath = path.join(emptyProjectDir, '.opencode/skills/openspec-explore/SKILL.md');
       expect(await fileExists(claudeSkillPath)).toBe(true);
-      expect(await fileExists(cursorSkillPath)).toBe(false); // Not selected
+      expect(await fileExists(opencodeSkillPath)).toBe(false); // Not selected
     });
 
     it('initializes with --tools none option', async () => {
@@ -127,10 +129,10 @@ describe('openspec CLI e2e basics', () => {
 
       // With --tools none, no tool skills should be created
       const claudeSkillPath = path.join(emptyProjectDir, '.claude/skills/openspec-explore/SKILL.md');
-      const cursorSkillPath = path.join(emptyProjectDir, '.cursor/skills/openspec-explore/SKILL.md');
+      const opencodeSkillPath = path.join(emptyProjectDir, '.opencode/skills/openspec-explore/SKILL.md');
 
       expect(await fileExists(claudeSkillPath)).toBe(false);
-      expect(await fileExists(cursorSkillPath)).toBe(false);
+      expect(await fileExists(opencodeSkillPath)).toBe(false);
     });
 
     it('returns error for invalid tool names', async () => {

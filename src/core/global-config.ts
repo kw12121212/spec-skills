@@ -9,20 +9,17 @@ export const GLOBAL_DATA_DIR_NAME = 'openspec';
 
 // TypeScript types
 export type Profile = 'core' | 'custom';
-export type Delivery = 'both' | 'skills' | 'commands';
 
 // TypeScript interfaces
 export interface GlobalConfig {
   featureFlags?: Record<string, boolean>;
   profile?: Profile;
-  delivery?: Delivery;
   workflows?: string[];
 }
 
 const DEFAULT_CONFIG: GlobalConfig = {
   featureFlags: {},
   profile: 'core',
-  delivery: 'both',
 };
 
 /**
@@ -124,10 +121,6 @@ export function getGlobalConfig(): GlobalConfig {
     if (parsed.profile === undefined) {
       merged.profile = DEFAULT_CONFIG.profile;
     }
-    if (parsed.delivery === undefined) {
-      merged.delivery = DEFAULT_CONFIG.delivery;
-    }
-
     return merged;
   } catch (error) {
     // Log warning for parse errors, but not for missing files
@@ -145,11 +138,12 @@ export function getGlobalConfig(): GlobalConfig {
 export function saveGlobalConfig(config: GlobalConfig): void {
   const configDir = getGlobalConfigDir();
   const configPath = getGlobalConfigPath();
+  const { delivery: _delivery, ...configToSave } = config as GlobalConfig & { delivery?: unknown };
 
   // Create directory if it doesn't exist
   if (!fs.existsSync(configDir)) {
     fs.mkdirSync(configDir, { recursive: true });
   }
 
-  fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n', 'utf-8');
+  fs.writeFileSync(configPath, JSON.stringify(configToSave, null, 2) + '\n', 'utf-8');
 }

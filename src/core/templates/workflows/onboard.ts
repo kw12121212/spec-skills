@@ -34,7 +34,7 @@ openspec --version 2>&1 || echo "CLI_NOT_INSTALLED"
 \`\`\`
 
 **If CLI not installed:**
-> OpenSpec CLI is not installed. Install it first, then come back to \`/opsx:onboard\`.
+> OpenSpec CLI is not installed. Install it first, then come back to the \`openspec-onboard\` skill.
 
 Stop here if not installed.
 
@@ -161,7 +161,7 @@ Spend 1-2 minutes investigating the relevant code:
 │   [Optional: ASCII diagram if helpful]  │
 └─────────────────────────────────────────┘
 
-Explore mode (\`/opsx:explore\`) is for this kind of thinking—investigating before implementing. You can use it anytime you need to think through a problem.
+The \`openspec-explore\` skill is for this kind of thinking-investigating before implementing. You can use it anytime you need to think through a problem.
 
 Now let's create a change to hold our work.
 \`\`\`
@@ -473,31 +473,31 @@ This same rhythm works for any size change—a small fix or a major feature.
 
 ---
 
-## Command Reference
+## Skill Reference
 
 **Core workflow:**
 
-| Command | What it does |
+| Skill | What it does |
 |---------|--------------|
-| \`/opsx:propose\` | Create a change and generate all artifacts |
-| \`/opsx:explore\` | Think through problems before/during work |
-| \`/opsx:apply\` | Implement tasks from a change |
-| \`/opsx:archive\` | Archive a completed change |
+| \`openspec-propose\` | Create a change and generate all artifacts |
+| \`openspec-explore\` | Think through problems before/during work |
+| \`openspec-apply-change\` | Implement tasks from a change |
+| \`openspec-archive-change\` | Archive a completed change |
 
-**Additional commands:**
+**Additional skills:**
 
-| Command | What it does |
+| Skill | What it does |
 |---------|--------------|
-| \`/opsx:new\` | Start a new change, step through artifacts one at a time |
-| \`/opsx:continue\` | Continue working on an existing change |
-| \`/opsx:ff\` | Fast-forward: create all artifacts at once |
-| \`/opsx:verify\` | Verify implementation matches artifacts |
+| \`openspec-new-change\` | Start a new change, step through artifacts one at a time |
+| \`openspec-continue-change\` | Continue working on an existing change |
+| \`openspec-ff-change\` | Fast-forward: create all artifacts at once |
+| \`openspec-verify-change\` | Verify implementation matches artifacts |
 
 ---
 
 ## What's Next?
 
-Try \`/opsx:propose\` on something you actually want to build. You've got the rhythm now!
+Try \`openspec-propose\` on something you actually want to build. You've got the rhythm now!
 \`\`\`
 
 ---
@@ -512,15 +512,15 @@ If the user says they need to stop, want to pause, or seem disengaged:
 No problem! Your change is saved at \`openspec/changes/<name>/\`.
 
 To pick up where we left off later:
-- \`/opsx:continue <name>\` - Resume artifact creation
-- \`/opsx:apply <name>\` - Jump to implementation (if tasks exist)
+- \`openspec-continue-change\` - Resume artifact creation
+- \`openspec-apply-change\` - Jump to implementation (if tasks exist)
 
 The work won't be lost. Come back whenever you're ready.
 \`\`\`
 
 Exit gracefully without pressure.
 
-### User just wants command reference
+### User just wants the skill reference
 
 If the user says they just want to see the commands or skip the tutorial:
 
@@ -529,23 +529,23 @@ If the user says they just want to see the commands or skip the tutorial:
 
 **Core workflow:**
 
-| Command | What it does |
+| Skill | What it does |
 |---------|--------------|
-| \`/opsx:propose <name>\` | Create a change and generate all artifacts |
-| \`/opsx:explore\` | Think through problems (no code changes) |
-| \`/opsx:apply <name>\` | Implement tasks |
-| \`/opsx:archive <name>\` | Archive when done |
+| \`openspec-propose\` | Create a change and generate all artifacts |
+| \`openspec-explore\` | Think through problems (no code changes) |
+| \`openspec-apply-change\` | Implement tasks |
+| \`openspec-archive-change\` | Archive when done |
 
-**Additional commands:**
+**Additional skills:**
 
-| Command | What it does |
+| Skill | What it does |
 |---------|--------------|
-| \`/opsx:new <name>\` | Start a new change, step by step |
-| \`/opsx:continue <name>\` | Continue an existing change |
-| \`/opsx:ff <name>\` | Fast-forward: all artifacts at once |
-| \`/opsx:verify <name>\` | Verify implementation |
+| \`openspec-new-change\` | Start a new change, step by step |
+| \`openspec-continue-change\` | Continue an existing change |
+| \`openspec-ff-change\` | Fast-forward: all artifacts at once |
+| \`openspec-verify-change\` | Verify implementation |
 
-Try \`/opsx:propose\` to start your first change.
+Try \`openspec-propose\` to start your first change.
 \`\`\`
 
 Exit gracefully.

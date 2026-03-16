@@ -8,7 +8,7 @@ import {
   saveGlobalConfig,
   GlobalConfig,
 } from '../core/global-config.js';
-import type { Profile, Delivery } from '../core/global-config.js';
+import type { Profile } from '../core/global-config.js';
 import {
   getNestedValue,
   setNestedValue,
@@ -23,11 +23,10 @@ import { CORE_WORKFLOWS, ALL_WORKFLOWS, getProfileWorkflows } from '../core/prof
 import { OPENSPEC_DIR_NAME } from '../core/config.js';
 import { hasProjectConfigDrift } from '../core/profile-sync-drift.js';
 
-type ProfileAction = 'both' | 'delivery' | 'workflows' | 'keep';
+type ProfileAction = 'workflows' | 'keep';
 
 interface ProfileState {
   profile: Profile;
-  delivery: Delivery;
   workflows: string[];
 }
 
@@ -100,11 +99,10 @@ function isPromptCancellationError(error: unknown): boolean {
  */
 export function resolveCurrentProfileState(config: GlobalConfig): ProfileState {
   const profile = config.profile || 'core';
-  const delivery = config.delivery || 'both';
   const workflows = [
     ...getProfileWorkflows(profile, config.workflows ? [...config.workflows] : undefined),
   ];
-  return { profile, delivery, workflows };
+  return { profile, workflows };
 }
 
 /**
@@ -153,10 +151,6 @@ function stableWorkflowOrder(workflows: readonly string[]): string[] {
 export function diffProfileState(before: ProfileState, after: ProfileState): ProfileStateDiff {
   const lines: string[] = [];
 
-  if (before.delivery !== after.delivery) {
-    lines.push(`delivery: ${before.delivery} -> ${after.delivery}`);
-  }
-
   if (before.profile !== after.profile) {
     lines.push(`profile: ${before.profile} -> ${after.profile}`);
   }
@@ -195,7 +189,7 @@ function maybeWarnConfigDrift(
   if (!fs.existsSync(openspecDir)) {
     return;
   }
-  if (!hasProjectConfigDrift(projectDir, state.workflows, state.delivery)) {
+  if (!hasProjectConfigDrift(projectDir, state.workflows)) {
     return;
   }
   console.log(colorize('Warning: Global config is not applied to this project. Run `openspec update` to sync.'));
@@ -253,10 +247,8 @@ export function registerConfigCommand(program: Command): void {
 
         // Annotate profile settings
         const profileSource = rawConfig.profile !== undefined ? '(explicit)' : '(default)';
-        const deliverySource = rawConfig.delivery !== undefined ? '(explicit)' : '(default)';
         console.log(`\nProfile settings:`);
         console.log(`  profile: ${config.profile} ${profileSource}`);
-        console.log(`  delivery: ${config.delivery} ${deliverySource}`);
         if (config.profile === 'core') {
           console.log(`  workflows: ${CORE_WORKFLOWS.join(', ')} (from core profile)`);
         } else if (config.workflows && config.workflows.length > 0) {
@@ -459,7 +451,6 @@ export function registerConfigCommand(program: Command): void {
         const config = getGlobalConfig();
         config.profile = 'core';
         config.workflows = [...CORE_WORKFLOWS];
-        // Preserve delivery setting
         saveGlobalConfig(config);
         console.log('Config updated. Run `openspec update` in your projects to apply.');
         return;
@@ -487,25 +478,13 @@ export function registerConfigCommand(program: Command): void {
         const currentState = resolveCurrentProfileState(config);
 
         console.log(chalk.bold('\nCurrent profile settings'));
-        console.log(`  Delivery: ${currentState.delivery}`);
         console.log(`  Workflows: ${formatWorkflowSummary(currentState.workflows, currentState.profile)}`);
-        console.log(chalk.dim('  Delivery = where workflows are installed (skills, commands, or both)'));
         console.log(chalk.dim('  Workflows = which actions are available (propose, explore, apply, etc.)'));
         console.log();
 
         const action = await select<ProfileAction>({
           message: 'What do you want to configure?',
           choices: [
-            {
-              value: 'both',
-              name: 'Delivery and workflows',
-              description: 'Update install mode and available actions together',
-            },
-            {
-              value: 'delivery',
-              name: 'Delivery only',
-              description: 'Change where workflows are installed',
-            },
             {
               value: 'workflows',
               name: 'Workflows only',
@@ -527,42 +506,10 @@ export function registerConfigCommand(program: Command): void {
 
         const nextState: ProfileState = {
           profile: currentState.profile,
-          delivery: currentState.delivery,
           workflows: [...currentState.workflows],
         };
 
-        if (action === 'both' || action === 'delivery') {
-          const deliveryChoices: { value: Delivery; name: string; description: string }[] = [
-            {
-              value: 'both' as Delivery,
-              name: 'Both (skills + commands)',
-              description: 'Install workflows as both skills and slash commands',
-            },
-            {
-              value: 'skills' as Delivery,
-              name: 'Skills only',
-              description: 'Install workflows only as skills',
-            },
-            {
-              value: 'commands' as Delivery,
-              name: 'Commands only',
-              description: 'Install workflows only as slash commands',
-            },
-          ];
-          for (const choice of deliveryChoices) {
-            if (choice.value === currentState.delivery) {
-              choice.name += ' [current]';
-            }
-          }
-
-          nextState.delivery = await select<Delivery>({
-            message: 'Delivery mode (how workflows are installed):',
-            choices: deliveryChoices,
-            default: currentState.delivery,
-          });
-        }
-
-        if (action === 'both' || action === 'workflows') {
+        if (action === 'workflows') {
           const formatWorkflowChoice = (workflow: string) => {
             const metadata = WORKFLOW_PROMPT_META[workflow] ?? {
               name: workflow,
@@ -607,7 +554,6 @@ export function registerConfigCommand(program: Command): void {
         console.log();
 
         config.profile = nextState.profile;
-        config.delivery = nextState.delivery;
         config.workflows = nextState.workflows;
         saveGlobalConfig(config);
 

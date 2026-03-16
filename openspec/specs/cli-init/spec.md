@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The `openspec init` command SHALL create a complete OpenSpec directory structure in any project, enabling immediate adoption of OpenSpec conventions with support for multiple AI coding assistants.
+The `openspec init` command SHALL create a complete OpenSpec directory structure in any project, enabling immediate adoption of OpenSpec conventions with support for the supported AI coding assistants.
 ## Requirements
 ### Requirement: Progress Indicators
 
@@ -36,7 +36,7 @@ openspec/
 
 ### Requirement: AI Tool Configuration
 
-The command SHALL configure AI coding assistants with skills and slash commands using a searchable multi-select experience.
+The command SHALL configure AI coding assistants with skills using a searchable multi-select experience.
 
 #### Scenario: Prompting for AI tool selection
 
@@ -51,8 +51,8 @@ The command SHALL configure AI coding assistants with skills and slash commands 
 #### Scenario: Selecting tools to configure
 
 - **WHEN** user selects tools and confirms
-- **THEN** generate skills in `.<tool>/skills/` directory for each selected tool
-- **AND** generate slash commands in `.<tool>/commands/opsx/` directory for each selected tool
+- **THEN** generate canonical skills in `openspec/skills/`
+- **AND** create linked `SKILL.md` entries in `.<tool>/skills/` for each selected tool
 - **AND** create `openspec/config.yaml` with default schema setting
 
 ### Requirement: Interactive Mode
@@ -84,17 +84,17 @@ The command SHALL provide clear, actionable next steps upon successful initializ
 - **THEN** display categorized summary:
   - "Created: <tools>" for newly configured tools
   - "Refreshed: <tools>" for already-configured tools that were updated
-  - Count of skills and commands generated
+  - Count of linked skills generated
 - **AND** display getting started section with:
-  - `/opsx:new` - Start a new change
-  - `/opsx:continue` - Create the next artifact
-  - `/opsx:apply` - Implement tasks
+  - `openspec-propose` - Start a new change
+  - `openspec-continue-change` - Create the next artifact
+  - `openspec-apply-change` - Implement tasks
 - **AND** display links to documentation and feedback
 
 #### Scenario: Displaying restart instruction
 
 - **WHEN** initialization completes successfully and tools were created or refreshed
-- **THEN** display instruction to restart IDE for slash commands to take effect
+- **THEN** display instruction to restart IDE for skill changes to take effect
 
 ### Requirement: Exit Codes
 
@@ -144,19 +144,19 @@ The command SHALL support non-interactive operation through command-line options
 
 - **WHEN** run with `--tools all`
 - **THEN** automatically select every available AI tool without prompting
-- **AND** proceed with skill and command generation
+- **AND** proceed with canonical skill generation and tool-link creation
 
 #### Scenario: Select specific tools non-interactively
 
-- **WHEN** run with `--tools claude,cursor`
+- **WHEN** run with `--tools claude,opencode`
 - **THEN** parse the comma-separated tool IDs
-- **AND** generate skills and commands for specified tools only
+- **AND** generate canonical skills and tool links for specified tools only
 
 #### Scenario: Skip tool configuration non-interactively
 
 - **WHEN** run with `--tools none`
 - **THEN** create only the openspec directory structure
-- **AND** skip skill and command generation
+- **AND** skip tool skill installation
 - **AND** create config only when config creation conditions are met
 
 #### Scenario: Invalid tool specification
@@ -167,7 +167,7 @@ The command SHALL support non-interactive operation through command-line options
 
 #### Scenario: Reserved value combined with tool IDs
 
-- **WHEN** run with `--tools all,claude` or `--tools none,cursor`
+- **WHEN** run with `--tools all,claude` or `--tools none,opencode`
 - **THEN** fail with exit code 1
 - **AND** display an error explaining reserved values cannot be combined with specific tool IDs
 
@@ -198,25 +198,18 @@ The command SHALL generate Agent Skills for selected AI tools.
 - **AND** each SKILL.md SHALL contain YAML frontmatter with name and description
 - **AND** each SKILL.md SHALL contain the skill instructions
 
-### Requirement: Slash Command Generation
+### Requirement: Linked Skill Installation
 
-The command SHALL generate opsx slash commands for selected AI tools.
+The command SHALL install tool-local skills as links to canonical OpenSpec skill files.
 
-#### Scenario: Generating slash commands for a tool
+#### Scenario: Linking a selected tool to canonical skills
 
 - **WHEN** a tool is selected during initialization
-- **THEN** create 9 slash command files using the tool's command adapter:
-  - `/opsx:explore`
-  - `/opsx:new`
-  - `/opsx:continue`
-  - `/opsx:apply`
-  - `/opsx:ff`
-  - `/opsx:verify`
-  - `/opsx:sync`
-  - `/opsx:archive`
-  - `/opsx:bulk-archive`
-- **AND** use tool-specific path conventions (e.g., `.claude/commands/opsx/` for Claude)
-- **AND** include tool-specific frontmatter format
+- **THEN** create `openspec/skills/<skill-dir>/SKILL.md` as the canonical file
+- **AND** create a tool-local link at `.<tool>/skills/<skill-dir>/SKILL.md`
+- **AND** prefer a relative symlink
+- **AND** fall back to a file hardlink if symlinks are unavailable
+- **AND** fail instead of copying duplicate skill contents if neither link type is possible
 
 ### Requirement: Config File Generation
 

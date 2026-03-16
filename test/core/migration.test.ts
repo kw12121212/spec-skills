@@ -5,7 +5,6 @@ import { randomUUID } from 'crypto';
 import fs from 'node:fs';
 import { promises as fsp } from 'node:fs';
 import { AI_TOOLS, type AIToolOption } from '../../src/core/config.js';
-import { CommandAdapterRegistry } from '../../src/core/command-generation/index.js';
 import { saveGlobalConfig, getGlobalConfigPath } from '../../src/core/global-config.js';
 import { migrateIfNeeded, scanInstalledWorkflows } from '../../src/core/migration.js';
 
@@ -25,14 +24,7 @@ async function writeSkill(projectPath: string, dirName: string): Promise<void> {
 }
 
 async function writeManagedCommand(projectPath: string, workflowId: string): Promise<void> {
-  const adapter = CommandAdapterRegistry.get('claude');
-  if (!adapter) {
-    throw new Error('Claude adapter not found');
-  }
-  const commandPath = adapter.getFilePath(workflowId);
-  const fullPath = path.isAbsolute(commandPath)
-    ? commandPath
-    : path.join(projectPath, commandPath);
+  const fullPath = path.join(projectPath, '.claude', 'commands', 'opsx', `${workflowId}.md`);
   await fsp.mkdir(path.dirname(fullPath), { recursive: true });
   await fsp.writeFile(fullPath, '# command\n', 'utf-8');
 }
@@ -61,7 +53,7 @@ describe('migration', () => {
     await fsp.rm(configHome, { recursive: true, force: true });
   });
 
-  it('migrates to custom skills delivery when only managed skills are detected', async () => {
+  it('migrates to custom workflow selection when only managed skills are detected', async () => {
     await writeSkill(projectDir, 'openspec-explore');
     await writeSkill(projectDir, 'openspec-apply-change');
 
@@ -69,11 +61,10 @@ describe('migration', () => {
 
     const config = readRawConfig();
     expect(config.profile).toBe('custom');
-    expect(config.delivery).toBe('skills');
     expect(config.workflows).toEqual(['explore', 'apply']);
   });
 
-  it('migrates to custom commands delivery when only managed commands are detected', async () => {
+  it('migrates to custom workflow selection when only managed commands are detected', async () => {
     await writeManagedCommand(projectDir, 'explore');
     await writeManagedCommand(projectDir, 'archive');
 
@@ -81,11 +72,10 @@ describe('migration', () => {
 
     const config = readRawConfig();
     expect(config.profile).toBe('custom');
-    expect(config.delivery).toBe('commands');
     expect(config.workflows).toEqual(['explore', 'archive']);
   });
 
-  it('migrates to custom both delivery when managed skills and commands are detected', async () => {
+  it('migrates to custom workflow selection when managed skills and commands are detected', async () => {
     await writeSkill(projectDir, 'openspec-explore');
     await writeManagedCommand(projectDir, 'apply');
 
@@ -93,7 +83,6 @@ describe('migration', () => {
 
     const config = readRawConfig();
     expect(config.profile).toBe('custom');
-    expect(config.delivery).toBe('both');
     expect(config.workflows).toEqual(['explore', 'apply']);
   });
 
@@ -101,7 +90,6 @@ describe('migration', () => {
     saveGlobalConfig({
       featureFlags: {},
       profile: 'core',
-      delivery: 'both',
     });
     await writeSkill(projectDir, 'openspec-explore');
 
@@ -109,23 +97,23 @@ describe('migration', () => {
 
     const config = readRawConfig();
     expect(config.profile).toBe('core');
-    expect(config.delivery).toBe('both');
     expect(config.workflows).toBeUndefined();
   });
 
-  it('preserves explicit delivery value during migration', async () => {
-    // Raw config has explicit delivery but no profile yet.
-    saveGlobalConfig({
-      featureFlags: {},
-      delivery: 'both',
-    });
+  it('drops legacy delivery during migration', async () => {
+    fs.mkdirSync(path.dirname(getGlobalConfigPath()), { recursive: true });
+    fs.writeFileSync(
+      getGlobalConfigPath(),
+      JSON.stringify({ featureFlags: {}, delivery: 'both' }, null, 2) + '\n',
+      'utf-8'
+    );
     await writeSkill(projectDir, 'openspec-explore');
 
     migrateIfNeeded(projectDir, [ensureClaudeTool()]);
 
     const config = readRawConfig();
     expect(config.profile).toBe('custom');
-    expect(config.delivery).toBe('both');
+    expect(config.delivery).toBeUndefined();
     expect(config.workflows).toEqual(['explore']);
   });
 

@@ -1,5 +1,5 @@
 /**
- * Core template types for skills and slash commands.
+ * Core template types for generated skill content.
  */
 
 export interface SkillTemplate {
@@ -11,6 +11,10 @@ export interface SkillTemplate {
   metadata?: Record<string, string>;
 }
 
+/**
+ * Legacy command template shape kept for compatibility with internal modules
+ * that still define deprecated command templates.
+ */
 export interface CommandTemplate {
   name: string;
   description: string;

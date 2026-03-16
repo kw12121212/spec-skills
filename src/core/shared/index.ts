@@ -7,8 +7,6 @@
 export {
   SKILL_NAMES,
   type SkillName,
-  COMMAND_IDS,
-  type CommandId,
   type ToolSkillStatus,
   type ToolVersionStatus,
   getToolsWithSkillsDir,
@@ -22,9 +20,6 @@ export {
 
 export {
   type SkillTemplateEntry,
-  type CommandTemplateEntry,
   getSkillTemplates,
-  getCommandTemplates,
-  getCommandContents,
   generateSkillContent,
 } from './skill-generation.js';

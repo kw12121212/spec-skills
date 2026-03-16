@@ -2,7 +2,7 @@
  * Profile System
  *
  * Defines workflow profiles that control which workflows are installed.
- * Profiles determine WHICH workflows; delivery (in global config) determines HOW.
+ * Profiles determine which workflows are installed.
  */
 
 import type { Profile } from './global-config.js';

@@ -1,6 +1,6 @@
 # CLI Reference
 
-The OpenSpec CLI (`openspec`) provides terminal commands for project setup, validation, status inspection, and management. These commands complement the AI slash commands (like `/opsx:propose`) documented in [Commands](commands.md).
+The OpenSpec CLI (`openspec`) provides terminal commands for project setup, validation, status inspection, and management. AI workflow execution is delivered through generated skills, not slash commands.
 
 ## Summary
 
@@ -65,9 +65,9 @@ These options work with all commands:
 
 ### `openspec init`
 
-Initialize OpenSpec in your project. Creates the folder structure and configures AI tool integrations.
+Initialize OpenSpec in your project. Creates the folder structure and configures AI tool skill links.
 
-Default behavior uses global config defaults: profile `core`, delivery `both`, workflows `propose, explore, apply, archive`.
+Default behavior uses global config defaults: profile `core`, workflows `propose, explore, apply, archive`.
 
 ```
 openspec init [path] [options]
@@ -89,7 +89,7 @@ openspec init [path] [options]
 
 `--profile custom` uses whatever workflows are currently selected in global config (`openspec config profile`).
 
-**Supported tool IDs (`--tools`):** `amazon-q`, `antigravity`, `auggie`, `claude`, `cline`, `codex`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `iflow`, `kilocode`, `kiro`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `windsurf`
+**Supported tool IDs (`--tools`):** `claude`, `codex`, `github-copilot`, `opencode`
 
 **Examples:**
 
@@ -100,8 +100,8 @@ openspec init
 # Initialize in a specific directory
 openspec init ./my-project
 
-# Non-interactive: configure for Claude and Cursor
-openspec init --tools claude,cursor
+# Non-interactive: configure for Claude and OpenCode
+openspec init --tools claude,opencode
 
 # Configure for all supported tools
 openspec init --tools all
@@ -119,19 +119,20 @@ openspec init --force
 openspec/
 ├── specs/              # Your specifications (source of truth)
 ├── changes/            # Proposed changes
+├── skills/             # Canonical OpenSpec skills
 └── config.yaml         # Project configuration
 
 .claude/skills/         # Claude Code skills (if claude selected)
-.cursor/skills/         # Cursor skills (if cursor selected)
-.cursor/commands/       # Cursor OPSX commands (if delivery includes commands)
-... (other tool configs)
+.codex/skills/          # Codex skills (if codex selected)
+.github/skills/         # GitHub Copilot skills (if github-copilot selected)
+.opencode/skills/       # OpenCode skills (if opencode selected)
 ```
 
 ---
 
 ### `openspec update`
 
-Update OpenSpec instruction files after upgrading the CLI. Re-generates AI tool configuration files using your current global profile, selected workflows, and delivery mode.
+Update OpenSpec instruction files after upgrading the CLI. Re-generates canonical skills and tool-local skill links using your current global profile and selected workflows.
 
 ```
 openspec update [path] [options]
@@ -807,32 +808,25 @@ openspec config edit
 # Configure profile with action-based wizard
 openspec config profile
 
-# Fast preset: switch workflows to core (keeps delivery mode)
+# Fast preset: switch workflows to core
 openspec config profile core
 ```
 
 `openspec config profile` starts with a current-state summary, then lets you choose:
-- Change delivery + workflows
-- Change delivery only
-- Change workflows only
+- Workflows only
 - Keep current settings (exit)
 
 If you keep current settings, no changes are written and no update prompt is shown.
-If there are no config changes but the current project files are out of sync with your global profile/delivery, OpenSpec will show a warning and suggest running `openspec update`.
+If there are no config changes but the current project files are out of sync with your global profile, OpenSpec will show a warning and suggest running `openspec update`.
 Pressing `Ctrl+C` also cancels the flow cleanly (no stack trace) and exits with code `130`.
 In the workflow checklist, `[x]` means the workflow is selected in global config. To apply those selections to project files, run `openspec update` (or choose `Apply changes to this project now?` when prompted inside a project).
 
 **Interactive examples:**
 
 ```bash
-# Delivery-only update
+# Workflows update
 openspec config profile
-# choose: Change delivery only
-# choose delivery: Skills only
-
-# Workflows-only update
-openspec config profile
-# choose: Change workflows only
+# choose: Workflows only
 # toggle workflows in the checklist, then confirm
 ```
 
@@ -928,7 +922,7 @@ openspec completion uninstall
 
 ## Related Documentation
 
-- [Commands](commands.md) - AI slash commands (`/opsx:propose`, `/opsx:apply`, etc.)
-- [Workflows](workflows.md) - Common patterns and when to use each command
+- [Commands](commands.md) - Generated OpenSpec skills
+- [Workflows](workflows.md) - Common patterns and when to use each skill
 - [Customization](customization.md) - Create custom schemas and templates
 - [Getting Started](getting-started.md) - First-time setup guide

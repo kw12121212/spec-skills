@@ -27,7 +27,7 @@ describe('tool-detection', () => {
   });
 
   describe('SKILL_NAMES', () => {
-    it('should contain all skill names matching COMMAND_IDS', () => {
+    it('should contain all managed skill names', () => {
       expect(SKILL_NAMES).toHaveLength(11);
       expect(SKILL_NAMES).toContain('openspec-explore');
       expect(SKILL_NAMES).toContain('openspec-new-change');
@@ -46,10 +46,7 @@ describe('tool-detection', () => {
   describe('getToolsWithSkillsDir', () => {
     it('should return tools that have skillsDir configured', () => {
       const tools = getToolsWithSkillsDir();
-      expect(tools).toContain('claude');
-      expect(tools).toContain('cursor');
-      expect(tools).toContain('windsurf');
-      expect(tools.length).toBeGreaterThan(0);
+      expect(tools).toEqual(['claude', 'codex', 'github-copilot', 'opencode']);
     });
   });
 
@@ -97,7 +94,9 @@ describe('tool-detection', () => {
     it('should return status for all tools with skillsDir', () => {
       const states = getToolStates(testDir);
       expect(states.has('claude')).toBe(true);
-      expect(states.has('cursor')).toBe(true);
+      expect(states.has('codex')).toBe(true);
+      expect(states.has('github-copilot')).toBe(true);
+      expect(states.has('opencode')).toBe(true);
 
       const claudeStatus = states.get('claude');
       expect(claudeStatus?.configured).toBe(false);
@@ -110,7 +109,7 @@ describe('tool-detection', () => {
 
       const states = getToolStates(testDir);
       expect(states.get('claude')?.configured).toBe(true);
-      expect(states.get('cursor')?.configured).toBe(false);
+      expect(states.get('codex')?.configured).toBe(false);
     });
   });
 
@@ -276,19 +275,16 @@ Content here
     });
 
     it('should return configured tools', async () => {
-      // Setup Claude
       const claudeSkillDir = path.join(testDir, '.claude', 'skills', 'openspec-explore');
+      const codexSkillDir = path.join(testDir, '.codex', 'skills', 'openspec-explore');
       await fs.mkdir(claudeSkillDir, { recursive: true });
+      await fs.mkdir(codexSkillDir, { recursive: true });
       await fs.writeFile(path.join(claudeSkillDir, 'SKILL.md'), 'content');
-
-      // Setup Cursor
-      const cursorSkillDir = path.join(testDir, '.cursor', 'skills', 'openspec-explore');
-      await fs.mkdir(cursorSkillDir, { recursive: true });
-      await fs.writeFile(path.join(cursorSkillDir, 'SKILL.md'), 'content');
+      await fs.writeFile(path.join(codexSkillDir, 'SKILL.md'), 'content');
 
       const tools = getConfiguredTools(testDir);
       expect(tools).toContain('claude');
-      expect(tools).toContain('cursor');
+      expect(tools).toContain('codex');
       expect(tools).toHaveLength(2);
     });
   });
@@ -300,19 +296,16 @@ Content here
     });
 
     it('should return version status for all configured tools', async () => {
-      // Setup Claude with old version
       const claudeSkillDir = path.join(testDir, '.claude', 'skills', 'openspec-explore');
+      const codexSkillDir = path.join(testDir, '.codex', 'skills', 'openspec-explore');
       await fs.mkdir(claudeSkillDir, { recursive: true });
+      await fs.mkdir(codexSkillDir, { recursive: true });
       await fs.writeFile(path.join(claudeSkillDir, 'SKILL.md'), `---
 metadata:
   generatedBy: "0.22.0"
 ---
 `);
-
-      // Setup Cursor with current version
-      const cursorSkillDir = path.join(testDir, '.cursor', 'skills', 'openspec-explore');
-      await fs.mkdir(cursorSkillDir, { recursive: true });
-      await fs.writeFile(path.join(cursorSkillDir, 'SKILL.md'), `---
+      await fs.writeFile(path.join(codexSkillDir, 'SKILL.md'), `---
 metadata:
   generatedBy: "0.23.0"
 ---
@@ -325,9 +318,9 @@ metadata:
       expect(claudeStatus?.generatedByVersion).toBe('0.22.0');
       expect(claudeStatus?.needsUpdate).toBe(true);
 
-      const cursorStatus = statuses.find(s => s.toolId === 'cursor');
-      expect(cursorStatus?.generatedByVersion).toBe('0.23.0');
-      expect(cursorStatus?.needsUpdate).toBe(false);
+      const codexStatus = statuses.find(s => s.toolId === 'codex');
+      expect(codexStatus?.generatedByVersion).toBe('0.23.0');
+      expect(codexStatus?.needsUpdate).toBe(false);
     });
   });
 });

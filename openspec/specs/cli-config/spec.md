@@ -169,29 +169,20 @@ The config command SHALL open the config file in the user's editor.
 
 ### Requirement: Profile Configuration Flow
 
-The `openspec config profile` command SHALL provide an action-first interactive flow that allows users to modify delivery and workflow settings independently.
+The `openspec config profile` command SHALL provide an action-first interactive flow that allows users to modify workflow settings.
 
 #### Scenario: Current profile summary appears first
 
 - **WHEN** user runs `openspec config profile` in an interactive terminal
 - **THEN** display a current-state header with:
-  - current delivery value
   - workflow count with profile label (core or custom)
 
 #### Scenario: Action-first menu offers skippable paths
 
 - **WHEN** user runs `openspec config profile` interactively
 - **THEN** the first prompt SHALL offer:
-  - `Change delivery + workflows`
-  - `Change delivery only`
-  - `Change workflows only`
+  - `Workflows only`
   - `Keep current settings (exit)`
-
-#### Scenario: Delivery prompt marks current selection
-
-- **WHEN** delivery selection is shown in `openspec config profile`
-- **THEN** the currently configured delivery option SHALL include `[current]` in its label
-- **AND** that value SHALL be preselected by default
 
 #### Scenario: No-op exits without saving or apply prompt
 
@@ -203,7 +194,7 @@ The `openspec config profile` command SHALL provide an action-first interactive 
 #### Scenario: No-op warns when current project is out of sync
 
 - **WHEN** `openspec config profile` exits with `No config changes.` inside an OpenSpec project
-- **AND** project files are out of sync with the current global profile/delivery
+- **AND** project files are out of sync with the current global profile
 - **THEN** display a non-blocking warning that global config is not yet applied to this project
 - **AND** include guidance to run `openspec update` to sync project files
 

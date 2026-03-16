@@ -209,7 +209,7 @@ After each invocation, show:
 - Schema workflow being used
 - Current progress (N/M complete)
 - What artifacts are now unlocked
-- Prompt: "Run \`/opsx:continue\` to create the next artifact"
+- Prompt: "Want to continue? Ask me to create the next artifact."
 
 **Artifact Creation Guidelines**
 

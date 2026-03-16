@@ -1,7 +1,7 @@
 # ai-tool-paths Specification
 
 ## Purpose
-Define AI tool path metadata used to generate OpenSpec skills and commands in tool-specific directories.
+Define AI tool path metadata used to generate OpenSpec skills in tool-specific directories.
 
 ## Requirements
 ### Requirement: AIToolOption skillsDir field
@@ -28,15 +28,20 @@ The `AI_TOOLS` array SHALL include `skillsDir` for tools that support the Agent 
 - **WHEN** looking up the `claude` tool
 - **THEN** `skillsDir` SHALL be `.claude`
 
-#### Scenario: Cursor paths defined
+#### Scenario: Codex paths defined
 
-- **WHEN** looking up the `cursor` tool
-- **THEN** `skillsDir` SHALL be `.cursor`
+- **WHEN** looking up the `codex` tool
+- **THEN** `skillsDir` SHALL be `.codex`
 
-#### Scenario: Windsurf paths defined
+#### Scenario: GitHub Copilot paths defined
 
-- **WHEN** looking up the `windsurf` tool
-- **THEN** `skillsDir` SHALL be `.windsurf`
+- **WHEN** looking up the `github-copilot` tool
+- **THEN** `skillsDir` SHALL be `.github`
+
+#### Scenario: OpenCode paths defined
+
+- **WHEN** looking up the `opencode` tool
+- **THEN** `skillsDir` SHALL be `.opencode`
 
 #### Scenario: Tools without skillsDir
 
@@ -57,4 +62,3 @@ The system SHALL handle paths correctly across operating systems.
 
 - **WHEN** constructing skill paths on macOS or Linux
 - **THEN** the system SHALL use `path.join()` for consistency
-

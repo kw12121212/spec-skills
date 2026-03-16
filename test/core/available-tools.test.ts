@@ -35,14 +35,14 @@ describe('available-tools', () => {
 
     it('should detect multiple tool directories', async () => {
       await fs.mkdir(path.join(testDir, '.claude'), { recursive: true });
-      await fs.mkdir(path.join(testDir, '.cursor'), { recursive: true });
-      await fs.mkdir(path.join(testDir, '.windsurf'), { recursive: true });
+      await fs.mkdir(path.join(testDir, '.codex'), { recursive: true });
+      await fs.mkdir(path.join(testDir, '.opencode'), { recursive: true });
 
       const tools = getAvailableTools(testDir);
       const toolValues = tools.map((t) => t.value);
       expect(toolValues).toContain('claude');
-      expect(toolValues).toContain('cursor');
-      expect(toolValues).toContain('windsurf');
+      expect(toolValues).toContain('codex');
+      expect(toolValues).toContain('opencode');
       expect(tools).toHaveLength(3);
     });
 
@@ -66,15 +66,15 @@ describe('available-tools', () => {
     });
 
     it('should return full AIToolOption objects', async () => {
-      await fs.mkdir(path.join(testDir, '.cursor'), { recursive: true });
+      await fs.mkdir(path.join(testDir, '.github'), { recursive: true });
 
       const tools = getAvailableTools(testDir);
       expect(tools).toHaveLength(1);
       expect(tools[0]).toMatchObject({
-        name: 'Cursor',
-        value: 'cursor',
+        name: 'GitHub Copilot',
+        value: 'github-copilot',
         available: true,
-        skillsDir: '.cursor',
+        skillsDir: '.github',
       });
     });
 

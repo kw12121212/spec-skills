@@ -13,7 +13,7 @@ import { AI_TOOLS, type AIToolOption } from './config.js';
  * Scans the project path for AI tool configuration directories and returns
  * the tools that are present.
  *
- * Checks for each tool's `skillsDir` (e.g., `.claude/`, `.cursor/`) at the
+ * Checks for each tool's `skillsDir` (e.g., `.claude/`, `.opencode/`) at the
  * project root. Only tools with a `skillsDir` property are considered.
  */
 export function getAvailableTools(projectPath: string): AIToolOption[] {
